@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#142a43">
+  <meta name="description" content="Porównaj rentowność mieszkania z najmu i wzrostu wartości z obligacjami po podatku. Kalkulator XIRR w złotych.">
+  <title>Mieszkanie czy obligacje? — Kalkulator rentowności</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23142a43'/%3E%3Cpath d='M7 16 16 8l9 8M10 14v11h12V14M14 25v-7h4v7' fill='none' stroke='%237accff' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#calculator">Przejdź do kalkulatora</a>
+  <header class="masthead">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">m<span>²</span></span><span>KAPITAŁ W CZASIE</span></div>
+    <span class="header-note">Kalkulator inwestycji <span class="header-divider">/</span> PLN</span>
+  </header>
+  <main id="calculator">
+    <div class="page-heading"><div><h1>Mieszkanie czy obligacje?</h1><p>Sprawdź, ile zarobił Twój kapitał.</p></div><div class="period-tag"><span>Okres inwestycji</span><strong id="period-label">—</strong></div></div>
+    <noscript><p class="error">Włącz JavaScript w przeglądarce, aby korzystać z kalkulatora.</p></noscript>
+    <div class="workspace">
+      <form class="inputs" id="inputs" novalidate autocomplete="off">
+        <section class="panel input-panel" aria-labelledby="property-title">
+          <div class="section-heading"><span class="step">01</span><h2 id="property-title">Nieruchomość</h2></div>
+          <div class="field-grid">
+            <div class="field"><label for="purchase-date">Data zakupu</label><input id="purchase-date" type="date" value="2013-10-30" min="1900-01-01" max="2100-12-31" required></div>
+            <div class="field"><label for="purchase">Całkowity koszt zakupu</label><div class="input-shell"><input id="purchase" inputmode="decimal" value="300 000" required aria-describedby="purchase-note"><span>zł</span></div></div>
+          </div>
+          <p class="field-note" id="purchase-note">Koszt zakupu obejmuje wszystkie opłaty i nakłady początkowe.</p>
+          <div class="field-grid valuation-row">
+            <div class="field"><label for="valuation-date">Data wyceny</label><input id="valuation-date" type="date" min="1900-01-01" max="2100-12-31" required></div>
+            <div class="field"><label for="property-value">Wartość mieszkania</label><div class="input-shell"><input id="property-value" inputmode="decimal" value="750 000" required><span>zł</span></div></div>
+          </div>
+        </section>
+        <section class="panel input-panel" aria-labelledby="rent-title">
+          <div class="section-heading"><span class="step">02</span><h2 id="rent-title">Najem netto</h2><span class="small-tag">bez kredytu</span></div>
+          <p class="section-note" id="rent-help">Wpisz dowolną z trzech kwot. Pozostałe przeliczymy.</p>
+          <div class="field-grid">
+            <div class="field"><label for="rent-monthly">Średnio miesięcznie</label><div class="input-shell"><input id="rent-monthly" inputmode="decimal" value="2 000" aria-describedby="rent-help" required><span>zł</span></div></div>
+            <div class="field"><label for="rent-annual">Średnio rocznie</label><div class="input-shell"><input id="rent-annual" inputmode="decimal" value="24 000" aria-describedby="rent-help" required><span>zł</span></div></div>
+          </div>
+          <div class="field total-field"><label for="rent-total">Łącznie za cały okres <span class="calculated-label" id="rent-source">z kwoty miesięcznej</span></label><div class="input-shell"><input id="rent-total" inputmode="decimal" aria-describedby="rent-help" required><span>zł</span></div></div>
+          <p class="field-note">Dochód po wszystkich kosztach i podatkach.</p>
+        </section>
+        <section class="panel input-panel bond-input" aria-labelledby="bond-title">
+          <div class="section-heading"><span class="step">03</span><h2 id="bond-title">Obligacje</h2><span class="small-tag">symulacja</span></div>
+          <div class="bond-settings"><div class="field"><label for="bond-rate">Rocznie brutto</label><div class="input-shell"><input id="bond-rate" inputmode="decimal" value="6" required><span>%</span></div></div><div class="tax-info"><strong>19% podatku</strong><span>od zysku, na koniec</span></div></div>
+          <p class="field-note">Stała stopa i roczna kapitalizacja przez cały okres.</p>
+        </section>
+        <p id="input-error" class="error" role="alert" hidden></p>
+      </form>
+      <div class="results" id="results" aria-label="Wyniki obliczeń">
+        <section class="return-panel" aria-labelledby="return-title">
+          <div class="result-heading"><h2 id="return-title">Roczna stopa zwrotu</h2><a href="#methodology" class="method-link">Jak liczymy XIRR? <span aria-hidden="true">↗</span></a></div>
+          <div class="return-grid"><div><p class="return-label"><span class="legend-dot property-dot"></span>Mieszkanie</p><strong class="hero-rate" id="property-irr">—</strong><span class="rate-note">najem + zmiana wartości</span></div><div class="bond-return"><p class="return-label"><span class="legend-dot bond-dot"></span>Obligacje</p><strong class="secondary-rate" id="bond-irr">—</strong><span class="rate-note">po podatku</span></div></div>
+          <div class="rate-difference" id="rate-difference">—</div>
+          <div class="profit-strip"><div><span>Łączny zysk z mieszkania</span><strong id="property-profit">—</strong></div><div><span>Zwrot za cały okres</span><strong id="property-roi">—</strong></div></div>
+        </section>
+        <section class="panel comparison-panel" aria-labelledby="comparison-title">
+          <div class="section-heading comparison-heading"><h2 id="comparison-title">Ten sam kapitał. Ten sam okres.</h2><p id="comparison-dates">—</p></div>
+          <div class="end-value-heading">Wartość końcowa wraz z wypłaconym dochodem</div>
+          <div class="bar-group"><div class="bar-label"><span>Mieszkanie + najem</span><strong id="property-final">—</strong></div><div class="bar-track" role="img" id="property-bar" aria-label=""><div class="bar-segment property-value-segment" id="property-value-bar"></div><div class="bar-segment rent-segment" id="rent-bar"></div></div><div class="bar-legend"><span><i class="legend-dot value-dot"></i>Wartość mieszkania</span><span><i class="legend-dot rent-dot"></i>Najem netto</span></div></div>
+          <div class="bar-group"><div class="bar-label"><span>Obligacje po podatku</span><strong id="bond-final">—</strong></div><div class="bar-track" role="img" id="bond-bar" aria-label=""><div class="bar-segment bond-capital-segment" id="bond-capital-bar"></div><div class="bar-segment bond-profit-segment" id="bond-profit-bar"></div></div><div class="bar-legend"><span><i class="legend-dot capital-dot"></i>Kapitał początkowy</span><span><i class="legend-dot bond-dot"></i>Odsetki netto</span></div></div>
+          <div class="advantage" id="advantage"><div><p id="winner-label">—</p><strong id="difference">—</strong></div><p id="difference-note">—</p></div>
+          <div class="breakdown" aria-label="Składniki zysku"><div><span>Dochód z najmu netto</span><strong id="total-rent-result">—</strong></div><div><span>Zmiana wartości mieszkania</span><strong id="appreciation">—</strong></div><div class="breakdown-divider"><span>Odsetki obligacji brutto</span><strong id="bond-gross">—</strong></div><div><span>Podatek od obligacji (19%)</span><strong id="bond-tax">—</strong></div><div><span>Zysk z obligacji netto</span><strong id="bond-profit">—</strong></div></div>
+          <p class="comparison-note">Najem nie jest reinwestowany. Odsetki obligacji są kapitalizowane.</p>
+        </section>
+      </div>
+    </div>
+    <details class="methodology" id="methodology"><summary><span>Założenia i sposób obliczeń</span><span aria-hidden="true">+</span></summary><div class="method-content"><div><h3>Rentowność mieszkania: XIRR</h3><p>Zakup jest wydatkiem na początku, najem — miesięcznym wpływem, a wartość mieszkania — umownym wpływem na dzień wyceny. XIRR uwzględnia terminy tych przepływów i podaje efektywną roczną stopę zwrotu, przy roku równym 365 dni.</p><p>Wycena nie jest zrealizowanym zyskiem. Przyjmujemy sprzedaż za podaną kwotę, bez dodatkowego podatku i kosztów sprzedaży. Wynik jest nominalny, bez korekty o inflację.</p><h3>Jak uśredniamy najem</h3><p>Pełny miesiąc kończy się w miesięczną rocznicę zakupu. Jeśli tego dnia nie ma w miesiącu, używamy jego ostatniego dnia. Niepełny miesiąc liczymy proporcjonalnie do liczby dni między rocznicami. Pierwszy wpływ przypada po miesiącu, a niepełny ostatni — na dzień wyceny.</p><p>Kwota roczna to 12 średnich kwot miesięcznych. Po zmianie dat zachowujemy ostatnią kwotę wpisaną przez Ciebie: miesięczną, roczną lub łączną. Przy wpisaniu sumy zakładamy równomierny najem; rzeczywiste terminy wpływów mogą zmienić XIRR.</p></div><div><h3>Obligacje: uproszczona symulacja</h3><p>Inwestujemy ten sam kapitał na ten sam okres. Wpisane oprocentowanie jest stałe przez cały czas; nie jest historyczną ofertą konkretnej emisji. Model pomija terminy wykupu poszczególnych serii i opłaty za przedterminowy wykup.</p><p class="formula">Zysk brutto = kapitał × [(1 + stopa)<sup>dni / 365</sup> − 1]<br>Zysk netto = zysk brutto × 81%</p><p>Odsetki kapitalizujemy rocznie; niepełny rok jest liczony potęgowo według dni/365. Podatek 19% pobieramy raz na końcu, wyłącznie od odsetek. Roczny wynik netto wyliczamy z wartości końcowej po podatku.</p><h3>Różnica w złotych</h3><p>Porównujemy wartość mieszkania plus otrzymany najem z kapitałem obligacji plus odsetkami po podatku. Ponieważ kapitał początkowy jest taki sam, różnica wartości końcowych jest też różnicą łącznych zysków. Wcześniejsze wypłaty najmu wpływają na XIRR, więc przewaga rocznej stopy może różnić się od przewagi kwotowej.</p><p class="sources">Źródła: <a href="https://support.microsoft.com/en-us/excel/functions/xirr-function" target="_blank" rel="noopener noreferrer">Definicja XIRR</a> · <a href="https://www.obligacjeskarbowe.pl/media_files/9b18d248-c989-4cd2-a11f-c29a40134973.pdf" target="_blank" rel="noopener noreferrer">Podatek od obligacji</a></p></div></div></details>
+    <footer><span>Obliczenia odbywają się w Twojej przeglądarce.</span><span>Mieszkanie / obligacje</span></footer>
+    <p class="sr-only" id="result-announcement" aria-live="polite" aria-atomic="true"></p>
+  </main>
+</body>
+</html>
